@@ -4,7 +4,7 @@
 dbhost="localhost"
 dbport=3306
 dbname="geonames"
-#dir=$( cd "$( dirname "$0" )" && pwd )
+dir=$( cd "$( dirname "$0" )" && pwd )
 
 download_folder="`pwd`/download"
 
@@ -51,9 +51,9 @@ download_geonames_data() {
         wget -c -P "$download_folder" -O "${zip:0:(-4)}_zip.zip" http://download.geonames.org/export/zip/$zip
     done
     unzip "*_zip.zip" -d ./zip
-    rm *_zip.zip
+#    rm *_zip.zip
     unzip "*.zip"
-    rm *.zip
+#    rm *.zip
 }
 
 if [ $# -lt 1 ]; then
@@ -120,7 +120,7 @@ case "$action" in
     create-db)
         echo "Creating database $dbname..."
         mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "DROP DATABASE IF EXISTS $dbname;"
-        mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8;" 
+        mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8mb4;"
         mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "USE $dbname;" 
         mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword $dbname < $dir/geonames_db_struct.sql
     ;;
@@ -133,7 +133,7 @@ case "$action" in
     
     import-dumps)
         echo "Importing geonames dumps into database $dbname"
-        mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword --local-infile=1 $dbname < $dir/geonames_import_data.sql
+        mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword --verbose --local-infile=1 $dbname < $dir/geonames_import_data.sql
     ;;    
     
     drop-db)
